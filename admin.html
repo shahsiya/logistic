@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Учёт логистики</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+			background-color: #f7f9fa;
+			color: #333;
+		}
+
+		h2 {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+
+		.input-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-bottom: 15px;
+		}
+
+		.input-row input {
+			padding: 5px;
+			width: 160px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+
+		.input-row input:focus {
+			border-color: #007BFF;
+			outline: none;
+		}
+
+		button {
+			padding: 10px 20px;
+			margin-bottom: 10px;
+			margin-right: 10px;
+			background-color: #007BFF;
+			border: none;
+			color: white;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 15px;
+		}
+
+		table th,
+		table td {
+			border: 1px solid #ccc;
+			padding: 6px;
+			text-align: center;
+		}
+
+		table th {
+			background-color: #e9ecef;
+		}
+
+		tfoot {
+			background-color: #f1f3f5;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Проверка авторизации -->
+	<script>
+		if (localStorage.getItem("loggedIn") !== "true") {
+			window.location.href = "index.html";
+		}
+	</script>
+
+	<h2>Учёт перевозок и прибыли</h2>
+
+	<div class="input-row">
+		<input type="date" id="date" />
+		<input type="number" id="kmMain" placeholder="Км основной" />
+		<input type="number" id="kmAdditional" placeholder="Км доп" />
+		<input type="number" id="freightMain" placeholder="Фрахт осн." />
+		<input type="number" id="freightAdditional" placeholder="Фрахт доп" />
+		<input type="number" id="fuelConsumption" step="0.1" placeholder="Расход л/100км" />
+		<input type="number" id="fuelPrice" step="0.01" placeholder="Цена топлива" />
+		<input type="number" id="tollRoads" placeholder="Платные дороги" />
+		<input type="number" id="hotel" placeholder="Отель" />
+		<input type="number" id="otherExpenses" placeholder="Прочие расходы" />
+	</div>
+
+	<button onclick="addData()">Добавить данные</button>
+	<button onclick="exportToExcel()">Экспорт в Excel</button>
+	<button onclick="clearData()">Очистить данные</button>
+	<button onclick="logout()">Выйти</button>
+
+	<table id="logTable">
+		<thead>
+			<tr>
+				<th>Дата</th>
+				<th>Км осн.</th>
+				<th>Км доп.</th>
+				<th>Общий км</th>
+				<th>Фрахт осн.</th>
+				<th>Фрахт доп.</th>
+				<th>Общий фрахт</th>
+				<th>Топливо (л)</th>
+				<th>Цена топлива</th>
+				<th>Топливо €</th>
+				<th>Платные</th>
+				<th>Отель</th>
+				<th>Прочее</th>
+				<th>Расход всего</th>
+				<th>Прибыль до налога</th>
+				<th>Налог 9%</th>
+				<th>Чистая прибыль</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+		<tfoot id="summaryRow"></tfoot>
+	</table>
+
+	<script>
+		let data = [];
+
+		window.onload = function () {
+			const saved = localStorage.getItem("logisticsData");
+			if (saved) {
+				data = JSON.parse(saved);
+				updateTable();
+			}
+		};
+
+		function saveToLocalStorage() {
+			localStorage.setItem("logisticsData", JSON.stringify(data));
+		}
+
+		function addData() {
+			const date = document.getElementById('date').value;
+			if (!date) return alert("Введите дату");
+
+			const kmMain = parseFloat(document.getElementById('kmMain').value) || 0;
+			const kmAdditional = parseFloat(document.getElementById('kmAdditional').value) || 0;
+			const freightMain = parseFloat(document.getElementById('freightMain').value) || 0;
+			const freightAdditional = parseFloat(document.getElementById('freightAdditional').value) || 0;
+			const fuelConsumption = parseFloat(document.getElementById('fuelConsumption').value) || 0;
+			const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 0;
+			const tollRoads = parseFloat(document.getElementById('tollRoads').value) || 0;
+			const hotel = parseFloat(document.getElementById('hotel').value) || 0;
+			const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
+
+			const totalKm = kmMain + kmAdditional;
+			const totalFreight = freightMain + freightAdditional;
+			const fuelUsed = (totalKm / 100) * fuelConsumption;
+			const fuelCost = fuelUsed * fuelPrice;
+			const totalExpenses = tollRoads + hotel + otherExpenses + fuelCost;
+			const profitBeforeTax = totalFreight - totalExpenses;
+			const tax = profitBeforeTax * 0.09;
+			const netProfit = profitBeforeTax - tax;
+
+			data.push({
+				date, kmMain, kmAdditional, totalKm,
+				freightMain, freightAdditional, totalFreight,
+				fuelUsed, fuelPrice, fuelCost,
+				tollRoads, hotel, otherExpenses,
+				totalExpenses, profitBeforeTax, tax, netProfit
+			});
+
+			saveToLocalStorage();
+			updateTable();
+		}
+
+		function updateTable() {
+			const tbody = document.querySelector("#logTable tbody");
+			tbody.innerHTML = "";
+			let sums = {
+				kmMain: 0, kmAdditional: 0, totalKm: 0,
+				freightMain: 0, freightAdditional: 0, totalFreight: 0,
+				fuelUsed: 0, fuelCost: 0,
+				tollRoads: 0, hotel: 0, otherExpenses: 0,
+				totalExpenses: 0, profitBeforeTax: 0, tax: 0, netProfit: 0
+			};
+
+			data.forEach((entry) => {
+				const row = document.createElement("tr");
+				row.innerHTML = `
+          <td>${entry.date}</td>
+          <td>${entry.kmMain}</td><td>${entry.kmAdditional}</td><td>${entry.totalKm}</td>
+          <td>${entry.freightMain.toFixed(2)}</td><td>${entry.freightAdditional.toFixed(2)}</td><td>${entry.totalFreight.toFixed(2)}</td>
+          <td>${entry.fuelUsed.toFixed(2)}</td><td>${entry.fuelPrice.toFixed(2)}</td><td>${entry.fuelCost.toFixed(2)}</td>
+          <td>${entry.tollRoads.toFixed(2)}</td><td>${entry.hotel.toFixed(2)}</td><td>${entry.otherExpenses.toFixed(2)}</td>
+          <td>${entry.totalExpenses.toFixed(2)}</td>
+          <td>${entry.profitBeforeTax.toFixed(2)}</td>
+          <td>${entry.tax.toFixed(2)}</td>
+          <td>${entry.netProfit.toFixed(2)}</td>
+        `;
+				tbody.appendChild(row);
+
+				for (let key in sums) {
+					sums[key] += entry[key] || 0;
+				}
+			});
+
+			document.getElementById("summaryRow").innerHTML = `
+        <td>ИТОГО</td>
+        <td>${sums.kmMain}</td><td>${sums.kmAdditional}</td><td>${sums.totalKm}</td>
+        <td>${sums.freightMain.toFixed(2)}</td><td>${sums.freightAdditional.toFixed(2)}</td><td>${sums.totalFreight.toFixed(2)}</td>
+        <td>${sums.fuelUsed.toFixed(2)}</td><td>-</td><td>${sums.fuelCost.toFixed(2)}</td>
+        <td>${sums.tollRoads.toFixed(2)}</td><td>${sums.hotel.toFixed(2)}</td><td>${sums.otherExpenses.toFixed(2)}</td>
+        <td>${sums.totalExpenses.toFixed(2)}</td>
+        <td>${sums.profitBeforeTax.toFixed(2)}</td><td>${sums.tax.toFixed(2)}</td><td>${sums.netProfit.toFixed(2)}</td>
+      `;
+		}
+
+		function clearData() {
+			if (confirm("Вы уверены, что хотите удалить все данные?")) {
+				localStorage.removeItem("logisticsData");
+				data = [];
+				updateTable();
+			}
+		}
+
+		function exportToExcel() {
+			const table = document.getElementById("logTable").outerHTML;
+			const blob = new Blob(["\ufeff", table], {
+				type: "application/vnd.ms-excel;charset=utf-8"
+			});
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "logistika.xls";
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
+
+		function logout() {
+			localStorage.removeItem("loggedIn");
+			window.location.href = "index.html";
+		}
+	</script>
+</body>
+
+</html>

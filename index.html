@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Вход</title>
+	<style>
+		body {
+			font-family: Arial;
+			text-align: center;
+			padding: 50px;
+			background-color: #f0f0f0;
+		}
+
+		input {
+			padding: 10px;
+			font-size: 16px;
+			margin-bottom: 15px;
+		}
+
+		button {
+			padding: 10px 20px;
+			font-size: 16px;
+		}
+	</style>
+</head>
+
+<body>
+	<h2>Вход в панель</h2>
+	<input type="password" id="password" placeholder="Введите пароль" />
+	<br />
+	<button onclick="login()">Войти</button>
+
+	<script>
+		const storedPassword = "sumaya123"; // Измени на свой пароль
+
+		function login() {
+			const input = document.getElementById("password").value;
+			if (input === storedPassword) {
+				localStorage.setItem("loggedIn", "true");
+				window.location.href = "admin.html";
+			} else {
+				alert("Неверный пароль");
+			}
+		}
+	</script>
+</body>
+
+</html>
