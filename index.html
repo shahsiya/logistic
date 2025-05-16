@@ -2,52 +2,54 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Вход</title>
   <style>
-    body { font-family: Arial; background: #f0f0f0; text-align: center; padding: 50px 20px; }
-    input, button { width: 100%; max-width: 300px; padding: 12px; margin-bottom: 15px; font-size: 16px; }
-    button { background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    .error { color: #e53935; margin-top: 10px; }
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 50px;
+      background-color: #f0f0f0;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
-  <h2>Введите пароль для доступа</h2>
-  <input type="password" id="password" placeholder="Пароль" />
+  <h2>Вход в панель</h2>
+  <input type="password" id="password" placeholder="Введите пароль" />
+  <br />
   <button onclick="login()">Войти</button>
-  <div id="error" class="error"></div>
 
   <script>
-    const AUTH_URL = "https://script.google.com/macros/s/AKfycbwEGuJ7dxYfZn0wIsMiErX3y2fvugc_LnhTMiG1sgSfEOubnBQG9Z50guljAd3iffJ7/exec";
-
     async function login() {
-      document.getElementById("error").textContent = "";
-      const pwd = document.getElementById("password").value.trim();
-      try {
-        const resp = await fetch(AUTH_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: pwd })
-        });
-        const result = await resp.json();
-        if (result.success) {
-          localStorage.setItem("loggedIn", "true");
-          window.location.href = "admin.html";
-        } else {
-          document.getElementById("error").textContent = "Неверный пароль";
-        }
-      } catch {
-        document.getElementById("error").textContent = "Ошибка соединения";
-      }
-    }
+      const password = document.getElementById("password").value;
+      const response = await fetch("https://script.google.com/macros/s/AKfycbwEGuJ7dxYfZn0wIsMiErX3y2fvugc_LnhTMiG1sgSfEOubnBQG9Z50guljAd3iffJ7/exec", {
+        method: "POST",
+        body: JSON.stringify({ password }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    // Если уже залогинены — сразу перекинуть
-    if (localStorage.getItem("loggedIn") === "true") {
-      window.location.href = "admin.html";
+      const result = await response.json();
+
+      if (result.success) {
+        localStorage.setItem("loggedIn", "true");
+        window.location.href = "admin.html";
+      } else {
+        alert("Неверный пароль");
+      }
     }
   </script>
 </body>
 </html>
+
 
 
