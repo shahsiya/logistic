@@ -22,17 +22,21 @@
 			flex-wrap: wrap;
 			gap: 10px;
 			margin-bottom: 15px;
+			justify-content: center;
 		}
 
 		.input-row input {
-			padding: 5px;
+			padding: 8px;
 			width: 160px;
 			border: 1px solid #ccc;
 			border-radius: 4px;
+			font-size: 1rem;
+			box-sizing: border-box;
+			min-width: 120px;
 		}
 
 		button {
-			padding: 10px 20px;
+			padding: 12px 25px;
 			margin-bottom: 10px;
 			margin-right: 10px;
 			background-color: #007BFF;
@@ -40,6 +44,8 @@
 			color: white;
 			border-radius: 5px;
 			cursor: pointer;
+			font-size: 1rem;
+			transition: background-color 0.3s;
 		}
 
 		button:hover {
@@ -50,13 +56,17 @@
 			width: 100%;
 			border-collapse: collapse;
 			margin-bottom: 15px;
+			overflow-x: auto;
+			display: block;
 		}
 
 		table th,
 		table td {
 			border: 1px solid #ccc;
-			padding: 6px;
+			padding: 6px 4px;
 			text-align: center;
+			font-size: 0.85rem;
+			white-space: nowrap;
 		}
 
 		table th {
@@ -88,6 +98,24 @@
 
 		.error {
 			background-color: #e53935;
+		}
+
+		@media (max-width: 768px) {
+			.input-row input {
+				width: 100%;
+				min-width: auto;
+			}
+
+			button {
+				width: 100%;
+				margin-right: 0;
+				margin-bottom: 10px;
+			}
+
+			table th, table td {
+				font-size: 0.75rem;
+				padding: 5px 3px;
+			}
 		}
 	</style>
 </head>
@@ -231,72 +259,5 @@
 			let sums = {
 				kmMain: 0, kmAdditional: 0, totalKm: 0,
 				freightMain: 0, freightAdditional: 0, totalFreight: 0,
-				fuelUsed: 0, fuelCost: 0,
-				tollRoads: 0, hotel: 0, otherExpenses: 0,
-				totalExpenses: 0, profitBeforeTax: 0, tax: 0, netProfit: 0
-			};
+				fuelUsed: 0, fuelCost
 
-			data.forEach((entry) => {
-				const row = document.createElement("tr");
-				row.innerHTML = `
-					<td>${entry.date}</td>
-					<td>${entry.kmMain}</td><td>${entry.kmAdditional}</td><td>${entry.totalKm}</td>
-					<td>${entry.freightMain.toFixed(2)}</td><td>${entry.freightAdditional.toFixed(2)}</td><td>${entry.totalFreight.toFixed(2)}</td>
-					<td>${entry.fuelUsed.toFixed(2)}</td><td>${entry.fuelPrice.toFixed(2)}</td><td>${entry.fuelCost.toFixed(2)}</td>
-					<td>${entry.tollRoads.toFixed(2)}</td><td>${entry.hotel.toFixed(2)}</td><td>${entry.otherExpenses.toFixed(2)}</td>
-					<td>${entry.totalExpenses.toFixed(2)}</td>
-					<td>${entry.profitBeforeTax.toFixed(2)}</td><td>${entry.tax.toFixed(2)}</td><td>${entry.netProfit.toFixed(2)}</td>
-				`;
-				tbody.appendChild(row);
-				for (let key in sums) sums[key] += entry[key] || 0;
-			});
-
-			document.getElementById("summaryRow").innerHTML = `
-				<td>ИТОГО</td>
-				<td>${sums.kmMain}</td><td>${sums.kmAdditional}</td><td>${sums.totalKm}</td>
-				<td>${sums.freightMain.toFixed(2)}</td><td>${sums.freightAdditional.toFixed(2)}</td><td>${sums.totalFreight.toFixed(2)}</td>
-				<td>${sums.fuelUsed.toFixed(2)}</td><td>-</td><td>${sums.fuelCost.toFixed(2)}</td>
-				<td>${sums.tollRoads.toFixed(2)}</td><td>${sums.hotel.toFixed(2)}</td><td>${sums.otherExpenses.toFixed(2)}</td>
-				<td>${sums.totalExpenses.toFixed(2)}</td>
-				<td>${sums.profitBeforeTax.toFixed(2)}</td><td>${sums.tax.toFixed(2)}</td><td>${sums.netProfit.toFixed(2)}</td>
-			`;
-		}
-
-		function clearData() {
-			if (confirm("Вы уверены, что хотите удалить все данные?")) {
-				localStorage.removeItem("logisticsData");
-				data = [];
-				updateTable();
-			}
-		}
-
-		function exportToExcel() {
-			const rows = document.querySelectorAll("table tr");
-			let csv = [];
-			for (let row of rows) {
-				const cols = row.querySelectorAll("td, th");
-				let csvRow = [];
-				for (let col of cols) {
-					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push(`"${text}"`);
-				}
-				csv.push(csvRow.join(","));
-			}
-			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", "logistika.csv");
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		}
-
-		function logout() {
-			localStorage.removeItem("loggedIn");
-			window.location.href = "index.html";
-		}
-	</script>
-</body>
-</html>
