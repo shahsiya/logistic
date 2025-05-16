@@ -118,6 +118,26 @@
       }
     }
   </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZPA7fvHsoTREFy8sD9FEZsSeSWTTkp0M",
+    authDomain: "logisticaauth.firebaseapp.com",
+    projectId: "logisticaauth",
+    appId: "1:923873189900:web:c1aedceeeee4945e748e29"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "login.html"; // или index.html, если логин там
+    }
+  });
+</script>
+
 </head>
 <body>
 
