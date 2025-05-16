@@ -1,49 +1,92 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-	<meta charset="UTF-8" />
-	<title>Вход</title>
-	<style>
-		body {
-			font-family: Arial;
-			text-align: center;
-			padding: 50px;
-			background-color: #f0f0f0;
-		}
-
-		input {
-			padding: 10px;
-			font-size: 16px;
-			margin-bottom: 15px;
-		}
-
-		button {
-			padding: 10px 20px;
-			font-size: 16px;
-		}
-	</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Вход</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+    h2 {
+      margin-bottom: 30px;
+    }
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: #e53935;
+      margin-top: 10px;
+    }
+  </style>
 </head>
-
 <body>
-	<h2>Вход в панель</h2>
-	<input type="password" id="password" placeholder="Введите пароль" />
-	<br />
-	<button onclick="login()">Войти</button>
 
-	<script>
-		const storedPassword = "logistica123"; // Измени на свой пароль
+  <h2>Вход в панель</h2>
+  <input type="password" id="password" placeholder="Введите пароль" />
+  <br />
+  <button onclick="login()">Войти</button>
+  <div id="error" class="error"></div>
 
-		function login() {
-			const input = document.getElementById("password").value;
-			if (input === storedPassword) {
-				localStorage.setItem("loggedIn", "true");
-				window.location.href = "admin.html";
-			} else {
-				alert("Неверный пароль");
-			}
-		}
-	</script>
+  <script>
+    // Замените на URL вашего Web App из Google Apps Script:
+    const AUTH_URL = "https://script.google.com/macros/s/AKfycbwEGuJ7dxYfZn0wIsMiErX3y2fvugc_LnhTMiG1sgSfEOubnBQG9Z50guljAd3iffJ7/exec";
+
+    async function login() {
+      const pwd = document.getElementById("password").value;
+      document.getElementById("error").textContent = "";
+
+      try {
+        const resp = await fetch(AUTH_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pwd })
+        });
+
+        const result = await resp.json();
+        if (result.success) {
+          localStorage.setItem("loggedIn", "true");
+          window.location.href = "admin.html";
+        } else {
+          document.getElementById("error").textContent = "Неверный пароль";
+        }
+      } catch (e) {
+        document.getElementById("error").textContent = "Ошибка соединения";
+        console.error(e);
+      }
+    }
+
+    // Если уже залогинен, сразу переводим в админку
+    if (localStorage.getItem("loggedIn") === "true") {
+      window.location.href = "admin.html";
+    }
+  </script>
+
 </body>
-
 </html>
+
