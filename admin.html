@@ -133,7 +133,6 @@
 	<script>
 		let data = [];
 
-		// Загрузка из localStorage
 		window.onload = function () {
 			const saved = localStorage.getItem("logisticsData");
 			if (saved) {
@@ -169,14 +168,16 @@
 			const tax = profitBeforeTax * 0.09;
 			const netProfit = profitBeforeTax - tax;
 
-			data.push({
+			const entry = {
 				date, kmMain, kmAdditional, totalKm,
 				freightMain, freightAdditional, totalFreight,
 				fuelUsed, fuelPrice, fuelCost,
 				tollRoads, hotel, otherExpenses,
 				totalExpenses, profitBeforeTax, tax, netProfit
-			});
+			};
 
+			data.push(entry);
+			sendToSheet(entry); // 🔄 Отправка в Google Таблицу
 			saveToLocalStorage();
 			updateTable();
 		}
@@ -259,6 +260,21 @@
 		function logout() {
 			localStorage.removeItem("loggedIn");
 			window.location.href = "index.html";
+		}
+
+		function sendToSheet(entry) {
+			const url = "https://script.google.com/macros/s/AKfycbypAhcwqrJ0HOAp_rRn0HyCn1mII4Na_JEqmsZs359QUS5kOtU_11yUzwmzx0Q-6F89Zg/exec";
+
+			fetch(url, {
+				method: "POST",
+				mode: "no-cors",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(entry)
+			})
+			.then(() => console.log("Данные отправлены в Google Таблицу"))
+			.catch(err => console.error("Ошибка отправки:", err));
 		}
 	</script>
 </body>
