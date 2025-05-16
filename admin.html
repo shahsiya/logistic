@@ -1,302 +1,325 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Учёт логистики</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 20px;
-			background-color: #f7f9fa;
-			color: #333;
-		}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Учёт логистики</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f7f9fa;
+      color: #333;
+    }
 
-		h2 {
-			text-align: center;
-			margin-bottom: 20px;
-		}
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-		.input-row {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-			margin-bottom: 15px;
-		}
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      justify-content: center;
+    }
 
-		.input-row input {
-			padding: 5px;
-			width: 160px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-		}
+    .input-row input {
+      padding: 8px;
+      width: 160px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      min-width: 120px;
+    }
 
-		button {
-			padding: 10px 20px;
-			margin-bottom: 10px;
-			margin-right: 10px;
-			background-color: #007BFF;
-			border: none;
-			color: white;
-			border-radius: 5px;
-			cursor: pointer;
-		}
+    button {
+      padding: 12px 25px;
+      margin-bottom: 10px;
+      margin-right: 10px;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
 
-		button:hover {
-			background-color: #0056b3;
-		}
+    button:hover {
+      background-color: #0056b3;
+    }
 
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin-bottom: 15px;
-		}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+      overflow-x: auto;
+      display: block;
+    }
 
-		table th,
-		table td {
-			border: 1px solid #ccc;
-			padding: 6px;
-			text-align: center;
-		}
+    table th,
+    table td {
+      border: 1px solid #ccc;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
 
-		table th {
-			background-color: #e9ecef;
-		}
+    table th {
+      background-color: #e9ecef;
+    }
 
-		tfoot {
-			background-color: #f1f3f5;
-			font-weight: bold;
-		}
+    tfoot {
+      background-color: #f1f3f5;
+      font-weight: bold;
+    }
 
-		.notification {
-			position: fixed;
-			bottom: 20px;
-			right: 20px;
-			color: white;
-			padding: 12px 20px;
-			border-radius: 6px;
-			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-			opacity: 0;
-			transition: opacity 0.5s ease;
-			pointer-events: none;
-			z-index: 1000;
-		}
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
 
-		.success {
-			background-color: #4caf50;
-		}
+    .success {
+      background-color: #4caf50;
+    }
 
-		.error {
-			background-color: #e53935;
-		}
-	</style>
+    .error {
+      background-color: #e53935;
+    }
+
+    @media (max-width: 768px) {
+      .input-row input {
+        width: 100%;
+        min-width: auto;
+      }
+
+      button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+
+      table th, table td {
+        font-size: 0.75rem;
+        padding: 5px 3px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-	<script>
-		if (localStorage.getItem("loggedIn") !== "true") {
-			window.location.href = "index.html";
-		}
-	</script>
+<script>
+  if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "index.html";
+  }
+</script>
 
-	<h2>Учёт перевозок и прибыли</h2>
+<h2>Учёт перевозок и прибыли</h2>
 
-	<div class="input-row">
-		<input type="date" id="date" />
-		<input type="number" id="kmMain" placeholder="Км основной" />
-		<input type="number" id="kmAdditional" placeholder="Км доп" />
-		<input type="number" id="freightMain" placeholder="Фрахт осн." />
-		<input type="number" id="freightAdditional" placeholder="Фрахт доп" />
-		<input type="number" id="fuelConsumption" step="0.1" placeholder="Расход л/100км" />
-		<input type="number" id="fuelPrice" step="0.01" placeholder="Цена топлива" />
-		<input type="number" id="tollRoads" placeholder="Платные дороги" />
-		<input type="number" id="hotel" placeholder="Отель" />
-		<input type="number" id="otherExpenses" placeholder="Прочие расходы" />
-	</div>
+<div class="input-row">
+  <input type="date" id="date" />
+  <input type="number" id="kmMain" placeholder="Км основной" />
+  <input type="number" id="kmAdditional" placeholder="Км доп" />
+  <input type="number" id="freightMain" placeholder="Фрахт осн." />
+  <input type="number" id="freightAdditional" placeholder="Фрахт доп" />
+  <input type="number" id="fuelConsumption" step="0.1" placeholder="Расход л/100км" />
+  <input type="number" id="fuelPrice" step="0.01" placeholder="Цена топлива" />
+  <input type="number" id="tollRoads" placeholder="Платные дороги" />
+  <input type="number" id="hotel" placeholder="Отель" />
+  <input type="number" id="otherExpenses" placeholder="Прочие расходы" />
+</div>
 
-	<button onclick="addData()">Добавить данные</button>
-	<button onclick="exportToExcel()">Экспорт в Excel</button>
-	<button onclick="clearData()">Очистить данные</button>
-	<button onclick="logout()">Выйти</button>
+<button onclick="addData()">Добавить данные</button>
+<button onclick="exportToExcel()">Экспорт в Excel</button>
+<button onclick="clearData()">Очистить данные</button>
+<button onclick="logout()">Выйти</button>
 
-	<table id="logTable">
-		<thead>
-			<tr>
-				<th>Дата</th>
-				<th>Км осн.</th>
-				<th>Км доп.</th>
-				<th>Общий км</th>
-				<th>Фрахт осн.</th>
-				<th>Фрахт доп.</th>
-				<th>Общий фрахт</th>
-				<th>Топливо (л)</th>
-				<th>Цена топлива</th>
-				<th>Топливо €</th>
-				<th>Платные</th>
-				<th>Отель</th>
-				<th>Прочее</th>
-				<th>Расход всего</th>
-				<th>Прибыль до налога</th>
-				<th>Налог 9%</th>
-				<th>Чистая прибыль</th>
-			</tr>
-		</thead>
-		<tbody></tbody>
-		<tfoot id="summaryRow"></tfoot>
-	</table>
+<table id="logTable">
+  <thead>
+    <tr>
+      <th>Дата</th>
+      <th>Км осн.</th>
+      <th>Км доп.</th>
+      <th>Общий км</th>
+      <th>Фрахт осн.</th>
+      <th>Фрахт доп.</th>
+      <th>Общий фрахт</th>
+      <th>Топливо (л)</th>
+      <th>Цена топлива</th>
+      <th>Топливо €</th>
+      <th>Платные</th>
+      <th>Отель</th>
+      <th>Прочее</th>
+      <th>Расход всего</th>
+      <th>Прибыль до налога</th>
+      <th>Налог 9%</th>
+      <th>Чистая прибыль</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot id="summaryRow"></tfoot>
+</table>
 
-	<div id="notification" class="notification"></div>
+<div id="notification" class="notification"></div>
 
-	<script>
-		let data = [];
+<script>
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbypAhcwqrJ0HOAp_rRn0HyCn1mII4Na_JEqmsZs359QUS5kOtU_11yUzwmzx0Q-6F89Zg/exec";
+  let data = [];
 
-		window.onload = function () {
-			const saved = localStorage.getItem("logisticsData");
-			if (saved) {
-				data = JSON.parse(saved);
-				updateTable();
-			}
-		};
+  window.onload = function () {
+    const saved = localStorage.getItem("logisticsData");
+    if (saved) {
+      data = JSON.parse(saved);
+      updateTable();
+    }
+  };
 
-		function saveToLocalStorage() {
-			localStorage.setItem("logisticsData", JSON.stringify(data));
-		}
+  function showNotification(message, type = 'success') {
+    const notif = document.getElementById("notification");
+    notif.textContent = message;
+    notif.className = `notification ${type}`;
+    notif.style.opacity = 1;
+    setTimeout(() => {
+      notif.style.opacity = 0;
+    }, 3000);
+  }
 
-		function showNotification(message, type = 'success') {
-			const notif = document.getElementById("notification");
-			notif.textContent = message;
-			notif.className = `notification ${type}`;
-			notif.style.opacity = 1;
-			setTimeout(() => {
-				notif.style.opacity = 0;
-			}, 3000);
-		}
+  function addData() {
+    const date = document.getElementById('date').value;
+    if (!date) return alert("Введите дату");
 
-		function sendToSheet(entry) {
-			const url = "https://script.google.com/macros/s/AKfycbyzPd2tWJKuqB7edpqAx8BHOEsIz76ndEpZaeX40IvseYBBI_ZxNaDt0asHL6tTTyXHUQ/exec";
-			fetch(url, {
-				method: "POST",
-				mode: "no-cors",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(entry)
-			})
-			.then(() => {
-				showNotification("✅ Данные успешно отправлены", "success");
-			})
-			.catch(() => {
-				showNotification("❌ Ошибка при отправке", "error");
-			});
-		}
+    const kmMain = parseFloat(document.getElementById('kmMain').value) || 0;
+    const kmAdditional = parseFloat(document.getElementById('kmAdditional').value) || 0;
+    const freightMain = parseFloat(document.getElementById('freightMain').value) || 0;
+    const freightAdditional = parseFloat(document.getElementById('freightAdditional').value) || 0;
+    const fuelConsumption = parseFloat(document.getElementById('fuelConsumption').value) || 0;
+    const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 0;
+    const tollRoads = parseFloat(document.getElementById('tollRoads').value) || 0;
+    const hotel = parseFloat(document.getElementById('hotel').value) || 0;
+    const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
 
-		function addData() {
-			const date = document.getElementById('date').value;
-			if (!date) return alert("Введите дату");
+    const totalKm = kmMain + kmAdditional;
+    const totalFreight = freightMain + freightAdditional;
+    const fuelUsed = (totalKm / 100) * fuelConsumption;
+    const fuelCost = fuelUsed * fuelPrice;
+    const totalExpenses = fuelCost + tollRoads + hotel + otherExpenses;
+    const profitBeforeTax = totalFreight - totalExpenses;
+    const tax = profitBeforeTax * 0.09;
+    const netProfit = profitBeforeTax - tax;
 
-			const kmMain = parseFloat(document.getElementById('kmMain').value) || 0;
-			const kmAdditional = parseFloat(document.getElementById('kmAdditional').value) || 0;
-			const freightMain = parseFloat(document.getElementById('freightMain').value) || 0;
-			const freightAdditional = parseFloat(document.getElementById('freightAdditional').value) || 0;
-			const fuelConsumption = parseFloat(document.getElementById('fuelConsumption').value) || 0;
-			const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 0;
-			const tollRoads = parseFloat(document.getElementById('tollRoads').value) || 0;
-			const hotel = parseFloat(document.getElementById('hotel').value) || 0;
-			const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
+    const entry = {
+      date, kmMain, kmAdditional, totalKm,
+      freightMain, freightAdditional, totalFreight,
+      fuelUsed, fuelPrice, fuelCost,
+      tollRoads, hotel, otherExpenses,
+      totalExpenses, profitBeforeTax, tax, netProfit
+    };
 
-			const totalKm = kmMain + kmAdditional;
-			const totalFreight = freightMain + freightAdditional;
-			const fuelUsed = (totalKm / 100) * fuelConsumption;
-			const fuelCost = fuelUsed * fuelPrice;
-			const totalExpenses = tollRoads + hotel + otherExpenses + fuelCost;
-			const profitBeforeTax = totalFreight - totalExpenses;
-			const tax = profitBeforeTax * 0.09;
-			const netProfit = profitBeforeTax - tax;
+    data.push(entry);
+    localStorage.setItem("logisticsData", JSON.stringify(data));
+    updateTable();
 
-			const entry = {
-				date, kmMain, kmAdditional, totalKm,
-				freightMain, freightAdditional, totalFreight,
-				fuelUsed, fuelPrice, fuelCost,
-				tollRoads, hotel, otherExpenses,
-				totalExpenses, profitBeforeTax, tax, netProfit
-			};
+    fetch(scriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry)
+    });
 
-			data.push(entry);
-			saveToLocalStorage();
-			updateTable();
-			sendToSheet(entry);
-		}
+    showNotification("✅ Данные добавлены");
+  }
 
-		function updateTable() {
-			const tbody = document.querySelector("#logTable tbody");
-			tbody.innerHTML = "";
-			let sums = {
-				kmMain: 0, kmAdditional: 0, totalKm: 0,
-				freightMain: 0, freightAdditional: 0, totalFreight: 0,
-				fuelUsed: 0, fuelCost: 0,
-				tollRoads: 0, hotel: 0, otherExpenses: 0,
-				totalExpenses: 0, profitBeforeTax: 0, tax: 0, netProfit: 0
-			};
+  function updateTable() {
+    const tbody = document.querySelector("#logTable tbody");
+    tbody.innerHTML = "";
 
-			data.forEach((entry) => {
-				const row = document.createElement("tr");
-				row.innerHTML = `
-					<td>${entry.date}</td>
-					<td>${entry.kmMain}</td><td>${entry.kmAdditional}</td><td>${entry.totalKm}</td>
-					<td>${entry.freightMain.toFixed(2)}</td><td>${entry.freightAdditional.toFixed(2)}</td><td>${entry.totalFreight.toFixed(2)}</td>
-					<td>${entry.fuelUsed.toFixed(2)}</td><td>${entry.fuelPrice.toFixed(2)}</td><td>${entry.fuelCost.toFixed(2)}</td>
-					<td>${entry.tollRoads.toFixed(2)}</td><td>${entry.hotel.toFixed(2)}</td><td>${entry.otherExpenses.toFixed(2)}</td>
-					<td>${entry.totalExpenses.toFixed(2)}</td>
-					<td>${entry.profitBeforeTax.toFixed(2)}</td><td>${entry.tax.toFixed(2)}</td><td>${entry.netProfit.toFixed(2)}</td>
-				`;
-				tbody.appendChild(row);
-				for (let key in sums) sums[key] += entry[key] || 0;
-			});
+    let summary = {
+      totalKm: 0, freightMain: 0, freightAdditional: 0, totalFreight: 0,
+      fuelUsed: 0, fuelCost: 0, tollRoads: 0, hotel: 0, otherExpenses: 0,
+      totalExpenses: 0, profitBeforeTax: 0, tax: 0, netProfit: 0
+    };
 
-			document.getElementById("summaryRow").innerHTML = `
-				<td>ИТОГО</td>
-				<td>${sums.kmMain}</td><td>${sums.kmAdditional}</td><td>${sums.totalKm}</td>
-				<td>${sums.freightMain.toFixed(2)}</td><td>${sums.freightAdditional.toFixed(2)}</td><td>${sums.totalFreight.toFixed(2)}</td>
-				<td>${sums.fuelUsed.toFixed(2)}</td><td>-</td><td>${sums.fuelCost.toFixed(2)}</td>
-				<td>${sums.tollRoads.toFixed(2)}</td><td>${sums.hotel.toFixed(2)}</td><td>${sums.otherExpenses.toFixed(2)}</td>
-				<td>${sums.totalExpenses.toFixed(2)}</td>
-				<td>${sums.profitBeforeTax.toFixed(2)}</td><td>${sums.tax.toFixed(2)}</td><td>${sums.netProfit.toFixed(2)}</td>
-			`;
-		}
+    data.forEach(entry => {
+      const row = document.createElement("tr");
+      for (let key of [
+        "date", "kmMain", "kmAdditional", "totalKm", "freightMain", "freightAdditional",
+        "totalFreight", "fuelUsed", "fuelPrice", "fuelCost", "tollRoads",
+        "hotel", "otherExpenses", "totalExpenses", "profitBeforeTax", "tax", "netProfit"
+      ]) {
+        const td = document.createElement("td");
+        td.textContent = typeof entry[key] === "number" ? entry[key].toFixed(2) : entry[key];
+        row.appendChild(td);
+      }
+      tbody.appendChild(row);
 
-		function clearData() {
-			if (confirm("Вы уверены, что хотите удалить все данные?")) {
-				localStorage.removeItem("logisticsData");
-				data = [];
-				updateTable();
-			}
-		}
+      summary.totalKm += entry.totalKm;
+      summary.freightMain += entry.freightMain;
+      summary.freightAdditional += entry.freightAdditional;
+      summary.totalFreight += entry.totalFreight;
+      summary.fuelUsed += entry.fuelUsed;
+      summary.fuelCost += entry.fuelCost;
+      summary.tollRoads += entry.tollRoads;
+      summary.hotel += entry.hotel;
+      summary.otherExpenses += entry.otherExpenses;
+      summary.totalExpenses += entry.totalExpenses;
+      summary.profitBeforeTax += entry.profitBeforeTax;
+      summary.tax += entry.tax;
+      summary.netProfit += entry.netProfit;
+    });
 
-		function exportToExcel() {
-			const rows = document.querySelectorAll("table tr");
-			let csv = [];
-			for (let row of rows) {
-				const cols = row.querySelectorAll("td, th");
-				let csvRow = [];
-				for (let col of cols) {
-					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push(`"${text}"`);
-				}
-				csv.push(csvRow.join(","));
-			}
-			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", "logistika.csv");
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		}
+    const tfoot = document.getElementById("summaryRow");
+    tfoot.innerHTML = `<tr><td colspan="3">Итого:</td>
+      <td>${summary.totalKm.toFixed(2)}</td>
+      <td>${summary.freightMain.toFixed(2)}</td>
+      <td>${summary.freightAdditional.toFixed(2)}</td>
+      <td>${summary.totalFreight.toFixed(2)}</td>
+      <td>${summary.fuelUsed.toFixed(2)}</td>
+      <td>-</td>
+      <td>${summary.fuelCost.toFixed(2)}</td>
+      <td>${summary.tollRoads.toFixed(2)}</td>
+      <td>${summary.hotel.toFixed(2)}</td>
+      <td>${summary.otherExpenses.toFixed(2)}</td>
+      <td>${summary.totalExpenses.toFixed(2)}</td>
+      <td>${summary.profitBeforeTax.toFixed(2)}</td>
+      <td>${summary.tax.toFixed(2)}</td>
+      <td>${summary.netProfit.toFixed(2)}</td></tr>`;
+  }
 
-		function logout() {
-			localStorage.removeItem("loggedIn");
-			window.location.href = "index.html";
-		}
-	</script>
+  function clearData() {
+    if (confirm("Удалить все данные?")) {
+      data = [];
+      localStorage.removeItem("logisticsData");
+      updateTable();
+    }
+  }
+
+  function exportToExcel() {
+    const table = document.getElementById("logTable").outerHTML;
+    const dataUri = 'data:application/vnd.ms-excel,' + encodeURIComponent(table);
+    const link = document.createElement('a');
+    link.href = dataUri;
+    link.download = 'logistics_data.xls';
+    link.click();
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "index.html";
+  }
+</script>
+
 </body>
 </html>
