@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,11 +29,6 @@
 			width: 160px;
 			border: 1px solid #ccc;
 			border-radius: 4px;
-		}
-
-		.input-row input:focus {
-			border-color: #007BFF;
-			outline: none;
 		}
 
 		button {
@@ -73,11 +67,32 @@
 			background-color: #f1f3f5;
 			font-weight: bold;
 		}
+
+		.notification {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			color: white;
+			padding: 12px 20px;
+			border-radius: 6px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+			opacity: 0;
+			transition: opacity 0.5s ease;
+			pointer-events: none;
+			z-index: 1000;
+		}
+
+		.success {
+			background-color: #4caf50;
+		}
+
+		.error {
+			background-color: #e53935;
+		}
 	</style>
 </head>
-
 <body>
-	<!-- Проверка авторизации -->
+
 	<script>
 		if (localStorage.getItem("loggedIn") !== "true") {
 			window.location.href = "index.html";
@@ -130,6 +145,8 @@
 		<tfoot id="summaryRow"></tfoot>
 	</table>
 
+	<div id="notification" class="notification"></div>
+
 	<script>
 		let data = [];
 
@@ -143,6 +160,32 @@
 
 		function saveToLocalStorage() {
 			localStorage.setItem("logisticsData", JSON.stringify(data));
+		}
+
+		function showNotification(message, type = 'success') {
+			const notif = document.getElementById("notification");
+			notif.textContent = message;
+			notif.className = `notification ${type}`;
+			notif.style.opacity = 1;
+			setTimeout(() => {
+				notif.style.opacity = 0;
+			}, 3000);
+		}
+
+		function sendToSheet(entry) {
+			const url = "https://script.google.com/macros/s/AKfycbypAhcwqrJ0HOAp_rRn0HyCn1mII4Na_JEqmsZs359QUS5kOtU_11yUzwmzx0Q-6F89Zg/exec";
+			fetch(url, {
+				method: "POST",
+				mode: "no-cors",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(entry)
+			})
+			.then(() => {
+				showNotification("✅ Данные успешно отправлены", "success");
+			})
+			.catch(() => {
+				showNotification("❌ Ошибка при отправке", "error");
+			});
 		}
 
 		function addData() {
@@ -177,9 +220,9 @@
 			};
 
 			data.push(entry);
-			sendToSheet(entry); // 🔄 Отправка в Google Таблицу
 			saveToLocalStorage();
 			updateTable();
+			sendToSheet(entry);
 		}
 
 		function updateTable() {
@@ -196,32 +239,27 @@
 			data.forEach((entry) => {
 				const row = document.createElement("tr");
 				row.innerHTML = `
-          <td>${entry.date}</td>
-          <td>${entry.kmMain}</td><td>${entry.kmAdditional}</td><td>${entry.totalKm}</td>
-          <td>${entry.freightMain.toFixed(2)}</td><td>${entry.freightAdditional.toFixed(2)}</td><td>${entry.totalFreight.toFixed(2)}</td>
-          <td>${entry.fuelUsed.toFixed(2)}</td><td>${entry.fuelPrice.toFixed(2)}</td><td>${entry.fuelCost.toFixed(2)}</td>
-          <td>${entry.tollRoads.toFixed(2)}</td><td>${entry.hotel.toFixed(2)}</td><td>${entry.otherExpenses.toFixed(2)}</td>
-          <td>${entry.totalExpenses.toFixed(2)}</td>
-          <td>${entry.profitBeforeTax.toFixed(2)}</td>
-          <td>${entry.tax.toFixed(2)}</td>
-          <td>${entry.netProfit.toFixed(2)}</td>
-        `;
+					<td>${entry.date}</td>
+					<td>${entry.kmMain}</td><td>${entry.kmAdditional}</td><td>${entry.totalKm}</td>
+					<td>${entry.freightMain.toFixed(2)}</td><td>${entry.freightAdditional.toFixed(2)}</td><td>${entry.totalFreight.toFixed(2)}</td>
+					<td>${entry.fuelUsed.toFixed(2)}</td><td>${entry.fuelPrice.toFixed(2)}</td><td>${entry.fuelCost.toFixed(2)}</td>
+					<td>${entry.tollRoads.toFixed(2)}</td><td>${entry.hotel.toFixed(2)}</td><td>${entry.otherExpenses.toFixed(2)}</td>
+					<td>${entry.totalExpenses.toFixed(2)}</td>
+					<td>${entry.profitBeforeTax.toFixed(2)}</td><td>${entry.tax.toFixed(2)}</td><td>${entry.netProfit.toFixed(2)}</td>
+				`;
 				tbody.appendChild(row);
-
-				for (let key in sums) {
-					sums[key] += entry[key] || 0;
-				}
+				for (let key in sums) sums[key] += entry[key] || 0;
 			});
 
 			document.getElementById("summaryRow").innerHTML = `
-        <td>ИТОГО</td>
-        <td>${sums.kmMain}</td><td>${sums.kmAdditional}</td><td>${sums.totalKm}</td>
-        <td>${sums.freightMain.toFixed(2)}</td><td>${sums.freightAdditional.toFixed(2)}</td><td>${sums.totalFreight.toFixed(2)}</td>
-        <td>${sums.fuelUsed.toFixed(2)}</td><td>-</td><td>${sums.fuelCost.toFixed(2)}</td>
-        <td>${sums.tollRoads.toFixed(2)}</td><td>${sums.hotel.toFixed(2)}</td><td>${sums.otherExpenses.toFixed(2)}</td>
-        <td>${sums.totalExpenses.toFixed(2)}</td>
-        <td>${sums.profitBeforeTax.toFixed(2)}</td><td>${sums.tax.toFixed(2)}</td><td>${sums.netProfit.toFixed(2)}</td>
-      `;
+				<td>ИТОГО</td>
+				<td>${sums.kmMain}</td><td>${sums.kmAdditional}</td><td>${sums.totalKm}</td>
+				<td>${sums.freightMain.toFixed(2)}</td><td>${sums.freightAdditional.toFixed(2)}</td><td>${sums.totalFreight.toFixed(2)}</td>
+				<td>${sums.fuelUsed.toFixed(2)}</td><td>-</td><td>${sums.fuelCost.toFixed(2)}</td>
+				<td>${sums.tollRoads.toFixed(2)}</td><td>${sums.hotel.toFixed(2)}</td><td>${sums.otherExpenses.toFixed(2)}</td>
+				<td>${sums.totalExpenses.toFixed(2)}</td>
+				<td>${sums.profitBeforeTax.toFixed(2)}</td><td>${sums.tax.toFixed(2)}</td><td>${sums.netProfit.toFixed(2)}</td>
+			`;
 		}
 
 		function clearData() {
@@ -235,7 +273,6 @@
 		function exportToExcel() {
 			const rows = document.querySelectorAll("table tr");
 			let csv = [];
-
 			for (let row of rows) {
 				const cols = row.querySelectorAll("td, th");
 				let csvRow = [];
@@ -245,7 +282,6 @@
 				}
 				csv.push(csvRow.join(","));
 			}
-
 			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
 			const url = URL.createObjectURL(blob);
 			const link = document.createElement("a");
@@ -261,22 +297,6 @@
 			localStorage.removeItem("loggedIn");
 			window.location.href = "index.html";
 		}
-
-		function sendToSheet(entry) {
-			const url = "https://script.google.com/macros/s/AKfycbypAhcwqrJ0HOAp_rRn0HyCn1mII4Na_JEqmsZs359QUS5kOtU_11yUzwmzx0Q-6F89Zg/exec";
-
-			fetch(url, {
-				method: "POST",
-				mode: "no-cors",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(entry)
-			})
-			.then(() => console.log("Данные отправлены в Google Таблицу"))
-			.catch(err => console.error("Ошибка отправки:", err));
-		}
 	</script>
 </body>
-
 </html>
