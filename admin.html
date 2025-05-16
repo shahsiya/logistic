@@ -133,6 +133,7 @@
 	<script>
 		let data = [];
 
+		// Загрузка из localStorage
 		window.onload = function () {
 			const saved = localStorage.getItem("logisticsData");
 			if (saved) {
@@ -231,17 +232,27 @@
 		}
 
 		function exportToExcel() {
-			const table = document.getElementById("logTable").outerHTML;
-			const blob = new Blob(["\ufeff", table], {
-				type: "application/vnd.ms-excel;charset=utf-8"
-			});
+			const rows = document.querySelectorAll("table tr");
+			let csv = [];
+
+			for (let row of rows) {
+				const cols = row.querySelectorAll("td, th");
+				let csvRow = [];
+				for (let col of cols) {
+					let text = col.innerText.replace(/"/g, '""');
+					csvRow.push(`"${text}"`);
+				}
+				csv.push(csvRow.join(","));
+			}
+
+			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
 			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = "logistika.xls";
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
+			const link = document.createElement("a");
+			link.href = url;
+			link.setAttribute("download", "logistika.csv");
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
 			URL.revokeObjectURL(url);
 		}
 
