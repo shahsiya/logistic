@@ -306,28 +306,14 @@
     }
   }
 
-function exportToExcel() {
-			const rows = document.querySelectorAll("table tr");
-			let csv = [];
-			for (let row of rows) {
-				const cols = row.querySelectorAll("td, th");
-				let csvRow = [];
-				for (let col of cols) {
-					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push(`"${text}"`);
-				}
-				csv.push(csvRow.join(","));
-			}
-			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", "logistika.csv");
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		}
+  function exportToExcel() {
+    const table = document.getElementById("logTable").outerHTML;
+    const dataUri = 'data:application/vnd.ms-excel,' + encodeURIComponent(table);
+    const link = document.createElement('a');
+    link.href = dataUri;
+    link.download = 'logistics_data.xls';
+    link.click();
+  }
 
   function logout() {
     localStorage.removeItem("loggedIn");
