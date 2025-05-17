@@ -141,12 +141,6 @@
 </head>
 <body>
 
-<script>
-  if (localStorage.getItem("loggedIn") !== "true") {
-    window.location.href = "index.html";
-  }
-</script>
-
 <h2>Учёт перевозок и прибыли</h2>
 
 <div class="input-row">
@@ -350,9 +344,10 @@ function exportToExcel() {
 		}
 
   function logout() {
-    localStorage.removeItem("loggedIn");
+  auth.signOut().then(() => {
     window.location.href = "index.html";
-  }
+  });
+}
 </script>
 
 </body>
