@@ -118,26 +118,6 @@
       }
     }
   </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZPA7fvHsoTREFy8sD9FEZsSeSWTTkp0M",
-    authDomain: "logisticaauth.firebaseapp.com",
-    projectId: "logisticaauth",
-    appId: "1:923873189900:web:c1aedceeeee4945e748e29"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "index.html"; // или index.html, если логин там
-    }
-  });
-</script>
-
 </head>
 <body>
 
@@ -320,35 +300,16 @@
     }
   }
 
-function exportToExcel() {
-			const rows = document.querySelectorAll("table tr");
-			let csv = [];
-			for (let row of rows) {
-				const cols = row.querySelectorAll("td, th");
-				let csvRow = [];
-				for (let col of cols) {
-					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push(`"${text}"`);
-				}
-				csv.push(csvRow.join(","));
-			}
-			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", "logistika.csv");
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		}
-
-  function logout() {
-  auth.signOut().then(() => {
-    window.location.href = "index.html";
-  });
-}
-</script>
-
-</body>
-</html>
+  function exportToExcel() {
+    const rows = document.querySelectorAll("table tr");
+    let csv = [];
+    for (let row of rows) {
+      const cols = row.querySelectorAll("td, th");
+      let csvRow = [];
+      for (let col of cols) {
+        let text = col.innerText.replace(/"/g, '""');
+        csvRow.push(`"${text}"`);
+      }
+      csv.push(csvRow.join(","));
+    }
+    const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;"
