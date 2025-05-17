@@ -118,26 +118,6 @@
       }
     }
   </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZPA7fvHsoTREFy8sD9FEZsSeSWTTkp0M",
-    authDomain: "logisticaauth.firebaseapp.com",
-    projectId: "logisticaauth",
-    appId: "1:923873189900:web:c1aedceeeee4945e748e29"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "index.html"; // или index.html, если логин там
-    }
-  });
-</script>
-
 </head>
 <body>
 
@@ -210,7 +190,7 @@
   function showNotification(message, type = 'success') {
     const notif = document.getElementById("notification");
     notif.textContent = message;
-    notif.className = notification ${type};
+    notif.className = `notification ${type}`;
     notif.style.opacity = 1;
     setTimeout(() => {
       notif.style.opacity = 0;
@@ -301,7 +281,7 @@
     });
 
     const tfoot = document.getElementById("summaryRow");
-    tfoot.innerHTML = <tr><td colspan="3">Итого:</td>
+    tfoot.innerHTML = `<tr><td colspan="3">Итого:</td>
       <td>${summary.totalKm.toFixed(2)}</td>
       <td>${summary.freightMain.toFixed(2)}</td>
       <td>${summary.freightAdditional.toFixed(2)}</td>
@@ -315,7 +295,7 @@
       <td>${summary.totalExpenses.toFixed(2)}</td>
       <td>${summary.profitBeforeTax.toFixed(2)}</td>
       <td>${summary.tax.toFixed(2)}</td>
-      <td>${summary.netProfit.toFixed(2)}</td></tr>;
+      <td>${summary.netProfit.toFixed(2)}</td></tr>`;
   }
 
   function clearData() {
@@ -334,7 +314,7 @@ function exportToExcel() {
 				let csvRow = [];
 				for (let col of cols) {
 					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push("${text}");
+					csvRow.push(`"${text}"`);
 				}
 				csv.push(csvRow.join(","));
 			}
@@ -357,5 +337,3 @@ function exportToExcel() {
 
 </body>
 </html>
-
-
