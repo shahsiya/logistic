@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Учёт логистики</title>
   <style>
     body {
@@ -118,9 +118,12 @@
       }
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 </head>
 <body>
-
 
 <h2>Учёт перевозок и прибыли</h2>
 
@@ -171,6 +174,7 @@
 <div id="notification" class="notification"></div>
 
 <script>
+  // Твой URL Google Apps Script
   const scriptUrl = "https://script.google.com/macros/s/AKfycbypAhcwqrJ0HOAp_rRn0HyCn1mII4Na_JEqmsZs359QUS5kOtU_11yUzwmzx0Q-6F89Zg/exec";
   let data = [];
 
@@ -289,46 +293,4 @@
       <td>${summary.otherExpenses.toFixed(2)}</td>
       <td>${summary.totalExpenses.toFixed(2)}</td>
       <td>${summary.profitBeforeTax.toFixed(2)}</td>
-      <td>${summary.tax.toFixed(2)}</td>
-      <td>${summary.netProfit.toFixed(2)}</td></tr>`;
-  }
-
-  function clearData() {
-    if (confirm("Удалить все данные?")) {
-      data = [];
-      localStorage.removeItem("logisticsData");
-      updateTable();
-    }
-  }
-
-function exportToExcel() {
-			const rows = document.querySelectorAll("table tr");
-			let csv = [];
-			for (let row of rows) {
-				const cols = row.querySelectorAll("td, th");
-				let csvRow = [];
-				for (let col of cols) {
-					let text = col.innerText.replace(/"/g, '""');
-					csvRow.push(`"${text}"`);
-				}
-				csv.push(csvRow.join(","));
-			}
-			const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", "logistika.csv");
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		}
-
-  function logout() {
-    localStorage.removeItem("loggedIn");
-    window.location.href = "index.html";
-  }
-</script>
-
-</body>
-</html>
+      <td>${summary.tax.toFixed(2
